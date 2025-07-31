@@ -1,0 +1,5 @@
+name = "oracle-market"
+compatibility_date = "2024-01-15"
+
+[env.production]
+compatibility_date = "2024-01-15"
