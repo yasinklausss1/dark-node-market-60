@@ -5,10 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oracle Market</title>
     <script>
-        // GitHub Pages SPA redirect
-        sessionStorage.redirect = location.href;
+        // GitHub Pages SPA redirect with subpath support
+        const pathSegmentsToKeep = 1; // Number of path segments to keep for GitHub Pages
+        const l = window.location;
+        l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/' +
+            '?p=/' + l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+            (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+            l.hash
+        );
     </script>
-    <meta http-equiv="refresh" content="0;URL='/'">
 </head>
 <body>
     <p>Redirecting...</p>
