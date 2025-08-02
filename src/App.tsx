@@ -19,7 +19,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 // Get the basename for GitHub Pages
-const basename = import.meta.env.PROD ? '/oracle-market' : '';
+const basename = import.meta.env.PROD ? '/dark-node-market-60' : '';
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
