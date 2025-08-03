@@ -12,8 +12,8 @@ export function BitcoinDeposit() {
   const [selectedCrypto, setSelectedCrypto] = useState<"bitcoin" | "litecoin">("bitcoin");
 
   const addresses = {
-    bitcoin: "bc1qncj57x5rrsmx2k0p99q4qr6g64dl7x9yvd6vql",
-    litecoin: "LWMLScar8dZ2vj8rf5NkuVsnV8ezUEChqG"
+    bitcoin: "bc1qdqmcl0rc5u62653y68wqxcadtespq68kzt4z2z",
+    litecoin: "LiFeR5xaRCWPPpNsvb1XHLPytyQHAHKRex"
   };
 
   const currentAddress = addresses[selectedCrypto];
