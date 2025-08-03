@@ -18,8 +18,8 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Get the basename for GitHub Pages
-const basename = import.meta.env.PROD ? '/dark-node-market-60' : '';
+// No basename needed for custom domain
+const basename = '';
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
