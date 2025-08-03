@@ -33,8 +33,10 @@ jobs:
       - name: Build
         run: npm run build
         
-      - name: Add CNAME
-        run: echo "oracle.market.store" > dist/CNAME
+      - name: Add CNAME and fix asset paths
+        run: |
+          echo "oracle.market.store" > dist/CNAME
+          find dist -name "*.html" -exec sed -i 's|="/assets/|="./assets/|g' {} \;
         
       - name: Setup Pages
         uses: actions/configure-pages@v5
