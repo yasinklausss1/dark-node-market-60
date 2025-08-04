@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ export function BitcoinDeposit() {
   const { toast } = useToast();
   const [selectedCrypto, setSelectedCrypto] = useState<"bitcoin" | "litecoin">("bitcoin");
 
+  // NEUE ADRESSEN - DIESE SIND JETZT AKTUELL
   const addresses = {
     bitcoin: "bc1qdqmcl0rc5u62653y68wqxcadtespq68kzt4z2z",
     litecoin: "LiFeR5xaRCWPPpNsvb1XHLPytyQHAHKRex"
@@ -24,7 +26,10 @@ export function BitcoinDeposit() {
       title: "Copied",
       description: `${selectedCrypto === "bitcoin" ? "Bitcoin" : "Litecoin"} address copied to clipboard`,
     });
+    console.log('Current address copied:', currentAddress); // Debug log
   };
+
+  console.log('BitcoinDeposit loaded with addresses:', addresses); // Debug log
 
   return (
     <Card>
@@ -43,7 +48,10 @@ export function BitcoinDeposit() {
           <Label className="text-sm font-medium">Select Cryptocurrency:</Label>
           <RadioGroup 
             value={selectedCrypto} 
-            onValueChange={(value) => setSelectedCrypto(value as "bitcoin" | "litecoin")}
+            onValueChange={(value) => {
+              console.log('Crypto changed to:', value); // Debug log
+              setSelectedCrypto(value as "bitcoin" | "litecoin");
+            }}
             className="flex gap-6"
           >
             <div className="flex items-center space-x-2">
