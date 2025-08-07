@@ -68,10 +68,13 @@ export function WalletBalance() {
   const refreshPayments = async () => {
     setRefreshing(true);
     try {
-      const { error } = await supabase.functions.invoke('check-bitcoin-payments');
-      
-      if (error) {
-        throw error;
+      const [btcRes, ltcRes] = await Promise.all([
+        supabase.functions.invoke('check-btc-shared'),
+        supabase.functions.invoke('check-ltc-shared')
+      ]);
+
+      if (btcRes.error || ltcRes.error) {
+        throw btcRes.error || ltcRes.error;
       }
 
       await fetchBalance();

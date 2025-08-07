@@ -49,9 +49,13 @@ const Marketplace = () => {
   
   const { cartItems, addToCart, updateQuantity, removeItem, clearCart, getCartItemCount } = useCart();
 
-  // Generate fake online user count between 90-143
-  const generateFakeOnlineUsers = () => {
-    return Math.floor(Math.random() * (143 - 90 + 1)) + 90;
+  // Fake online users logic: start below max and adjust every interval
+  const generateInitialOnlineUsers = () => Math.floor(Math.random() * (85 - 60 + 1)) + 60;
+  const adjustOnlineUsers = (prev: number) => {
+    const change = Math.floor(Math.random() * (9 - 4 + 1)) + 4;
+    const direction = Math.random() < 0.5 ? -1 : 1;
+    const next = Math.min(93, Math.max(1, prev + change * direction));
+    return next;
   };
 
   useEffect(() => {
@@ -62,7 +66,7 @@ const Marketplace = () => {
     fetchUserCount();
     
     // Initialize fake online users
-    setOnlineUsers(generateFakeOnlineUsers());
+    setOnlineUsers(generateInitialOnlineUsers());
     
     // Set up real-time listener for user count
     const userCountChannel = supabase
@@ -75,10 +79,10 @@ const Marketplace = () => {
       )
       .subscribe();
 
-    // Update fake online users every 4 minutes (240 seconds)
+    // Update fake online users every 3 minutes (180 seconds)
     const onlineUsersInterval = setInterval(() => {
-      setOnlineUsers(generateFakeOnlineUsers());
-    }, 240000);
+      setOnlineUsers(prev => adjustOnlineUsers(prev));
+    }, 180000);
       
     return () => {
       supabase.removeChannel(userCountChannel);
