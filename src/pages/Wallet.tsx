@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { WalletBalance } from "@/components/WalletBalance";
-import { BitcoinDeposit } from "@/components/BitcoinDeposit";
+import { DepositRequest } from "@/components/DepositRequest";
 import { TransactionHistory } from "@/components/TransactionHistory";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -31,7 +31,7 @@ export default function Wallet() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-6">
           <WalletBalance />
-          <BitcoinDeposit />
+          <DepositRequest />
         </div>
         
         <div>

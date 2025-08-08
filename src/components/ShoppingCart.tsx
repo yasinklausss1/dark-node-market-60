@@ -127,96 +127,46 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({
   };
 
   const handleConfirmOrder = async (addressData: any) => {
-    if (!user || !walletBalance) return;
+    if (!user || !selectedPaymentMethod) return;
 
     setIsProcessingOrder(true);
     
     try {
-      // Create order
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          user_id: user.id,
-          total_amount_eur: totalEUR,
-          status: 'pending'
-        })
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-
-      // Create order items
-      const orderItems = cartItems.map(item => ({
-        order_id: order.id,
-        product_id: item.id,
-        quantity: item.quantity,
-        price_eur: item.price
+      // Use the new process-order function
+      const items = cartItems.map(item => ({
+        id: item.id,
+        quantity: item.quantity
       }));
 
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
+      const { data, error } = await supabase.functions.invoke('process-order', {
+        body: {
+          userId: user.id,
+          items,
+          method: selectedPaymentMethod,
+          btcPrice,
+          ltcPrice
+        }
+      });
 
-      if (itemsError) throw itemsError;
-
-      // Update product stock
-      for (const item of cartItems) {
-        // First get the current stock
-        const { data: productData, error: fetchError } = await supabase
-          .from('products')
-          .select('stock')
-          .eq('id', item.id)
-          .single();
-
-        if (fetchError) throw fetchError;
-
-        // Update the stock
-        const newStock = productData.stock - item.quantity;
-        const { error: stockError } = await supabase
-          .from('products')
-          .update({ stock: Math.max(0, newStock) })
-          .eq('id', item.id);
-
-        if (stockError) throw stockError;
-      }
-
-      // Update wallet balance
-      const newBalance = walletBalance.balance_eur - totalEUR;
-      const { error: balanceError } = await supabase
-        .from('wallet_balances')
-        .update({ balance_eur: newBalance })
-        .eq('user_id', user.id);
-
-      if (balanceError) throw balanceError;
-
-      // Create transaction record
-      const { error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          amount_eur: -totalEUR,
-          type: 'purchase',
-          description: `Order #${order.id.slice(0, 8)}`,
-          status: 'confirmed'
-        });
-
-      if (transactionError) throw transactionError;
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       // Success
       toast({
         title: "Order Successful",
-        description: "Your order has been successfully placed",
+        description: "Your order has been successfully placed and sellers have been credited",
       });
 
       onClearCart();
       setCheckoutOpen(false);
+      setPaymentMethodOpen(false);
       onOpenChange(false);
       
     } catch (error) {
       console.error('Error processing order:', error);
       toast({
         title: "Error",
-        description: "Order could not be processed",
+        description: error instanceof Error ? error.message : "Order could not be processed",
         variant: "destructive",
       });
     } finally {
