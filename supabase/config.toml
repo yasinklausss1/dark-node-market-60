@@ -1,1 +1,7 @@
 project_id = "iqeubhhqdurqoaxnnyng"
+
+[functions.check-bitcoin-payments]
+verify_jwt = false
+
+[functions.check-litecoin-payments]
+verify_jwt = false
