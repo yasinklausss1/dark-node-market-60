@@ -37,13 +37,27 @@ export function DepositRequest() {
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=eur')
       ]);
       
+      if (!btcResponse.ok || !ltcResponse.ok) {
+        throw new Error('Failed to fetch prices from API');
+      }
+      
       const btcData = await btcResponse.json();
       const ltcData = await ltcResponse.json();
       
-      setBtcPrice(btcData.bitcoin.eur);
-      setLtcPrice(ltcData.litecoin.eur);
+      const btcPriceValue = btcData.bitcoin?.eur;
+      const ltcPriceValue = ltcData.litecoin?.eur;
+      
+      if (!btcPriceValue || !ltcPriceValue) {
+        throw new Error('Invalid price data received');
+      }
+      
+      setBtcPrice(btcPriceValue);
+      setLtcPrice(ltcPriceValue);
+      
+      return { btcPrice: btcPriceValue, ltcPrice: ltcPriceValue };
     } catch (error) {
       console.error('Error fetching crypto prices:', error);
+      throw new Error('Could not fetch crypto prices');
     }
   };
 
@@ -69,13 +83,13 @@ export function DepositRequest() {
     setLoading(true);
     
     try {
-      await fetchPrices();
+      const prices = await fetchPrices();
       
       const amountEur = parseFloat(eurAmount);
-      const price = selectedCrypto === "bitcoin" ? btcPrice : ltcPrice;
+      const price = selectedCrypto === "bitcoin" ? prices.btcPrice : prices.ltcPrice;
       
-      if (!price) {
-        throw new Error("Could not fetch crypto price");
+      if (!price || price <= 0) {
+        throw new Error("Invalid crypto price received");
       }
       
       const amountCrypto = amountEur / price;
@@ -125,6 +139,8 @@ export function DepositRequest() {
       if (error instanceof Error) {
         if (error.message.includes('auth')) {
           errorMessage = "Please log in to create a deposit request";
+        } else if (error.message.includes('price')) {
+          errorMessage = "Could not fetch current crypto prices. Please try again.";
         } else {
           errorMessage = error.message;
         }
