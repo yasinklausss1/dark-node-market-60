@@ -48,7 +48,16 @@ export function DepositRequest() {
   };
 
   const createDepositRequest = async () => {
-    if (!user || !eurAmount || parseFloat(eurAmount) <= 0) {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to create a deposit request",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!eurAmount || parseFloat(eurAmount) <= 0) {
       toast({
         title: "Error",
         description: "Please enter a valid amount",
@@ -110,9 +119,20 @@ export function DepositRequest() {
       
     } catch (error) {
       console.error('Error creating deposit request:', error);
+      
+      let errorMessage = "Could not create deposit request";
+      
+      if (error instanceof Error) {
+        if (error.message.includes('auth')) {
+          errorMessage = "Please log in to create a deposit request";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Error",
-        description: "Could not create deposit request",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -247,7 +267,13 @@ export function DepositRequest() {
               placeholder="Enter amount in EUR"
               value={eurAmount}
               onChange={(e) => setEurAmount(e.target.value)}
+              disabled={!user}
             />
+            {!user && (
+              <p className="text-sm text-muted-foreground">
+                Please log in to create deposit requests
+              </p>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -276,7 +302,7 @@ export function DepositRequest() {
 
           <Button 
             onClick={createDepositRequest} 
-            disabled={loading || !eurAmount || parseFloat(eurAmount) <= 0}
+            disabled={loading || !user || !eurAmount || parseFloat(eurAmount) <= 0}
             className="w-full"
           >
             {loading ? (
